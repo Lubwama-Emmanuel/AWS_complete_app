@@ -1,0 +1,42 @@
+service: sls-base
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 256
+  timeout: 15
+  stage: ${opt:stage, 'dev'}
+  region: us-east-2
+
+
+resources:
+  Resources:
+    AuctionTable: ${file(src/resources/Resource.yml):AuctionTable}
+
+
+functions:
+  createAuction:
+    handler: src/handlers/handler.createAuction
+    events:
+      - http:
+          method: POST
+          path: /create
+
+  getAuctions:
+    handler: src/handlers/handler.getAuctions
+    events:
+      - http:
+          method: GET
+          path: /getAuctions
+
+  getAuction:
+    handler: src/handlers/handler.getAuctionById
+    events:
+      - http:
+          method: GET
+          path: /getAuction/{id}
