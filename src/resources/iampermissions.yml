@@ -4,5 +4,6 @@ IAMPERMISSIONS:
     - 'dynamodb:PutItem'
     - 'dynamodb:Scan'
     - 'dynamodb:GetItem'
+    - 'dynamodb:PatchItem'
   Resource:
     - ${self:custom.AuctionsTable.arn}
