@@ -1,6 +1,7 @@
 const dynamoDB = require("../database/db");
 const { v4 } = require("uuid");
 
+// const tableName = process.env.TABLE_NAME;
 const tableName = "AuctionTable-dev";
 
 module.exports.createAuction = async (event, context) => {
@@ -34,8 +35,6 @@ module.exports.createAuction = async (event, context) => {
 module.exports.getAuctions = async (event, context) => {
   try {
     const auctions = await dynamoDB.scan({ TableName: tableName }).promise();
-    console.log(auctions);
-    console.log(event);
     return {
       statusCode: 200,
       body: JSON.stringify(auctions),
@@ -51,12 +50,12 @@ module.exports.getAuctions = async (event, context) => {
 
 module.exports.getAuctionById = async (event, context) => {
   try {
-    const id = event.pathParameters.id;
+    const { id } = event.pathParameters;
     console.log(id);
     const auction = await dynamoDB.get({
       TableName: tableName,
       Key: {
-        id: id,
+        id,
       },
     });
     console.log(auction);

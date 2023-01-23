@@ -1,6 +1,6 @@
 service: sls-base
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 plugins:
   - serverless-offline
@@ -12,12 +12,16 @@ provider:
   timeout: 15
   stage: ${opt:stage, 'dev'}
   region: us-east-2
-
+  environment:
+    TABLE_NAME: ${self:custom.AuctionsTable.name}
+  iam:
+    role:
+      statements:
+        - ${file(src/resources/iampermissions.yml):IAMPERMISSIONS}
 
 resources:
   Resources:
     AuctionTable: ${file(src/resources/Resource.yml):AuctionTable}
-
 
 functions:
   createAuction:
@@ -40,3 +44,8 @@ functions:
       - http:
           method: GET
           path: /getAuction/{id}
+
+custom:
+  AuctionsTable:
+    name: !Ref AuctionTable
+    arn: !GetAtt AuctionTable.Arn
