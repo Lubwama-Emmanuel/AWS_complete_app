@@ -45,6 +45,13 @@ functions:
           method: GET
           path: /getAuction/{id}
 
+  placeBid:
+    handler: src/handlers/handler.placeBid
+    event:
+      - http:
+          method: PATCH
+          path: /placeBid/{id}/bids
+
 custom:
   AuctionsTable:
     name: !Ref AuctionTable
