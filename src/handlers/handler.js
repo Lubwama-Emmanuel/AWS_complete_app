@@ -1,4 +1,5 @@
 const dynamoDB = require("../database/db");
+const { getAuctionById } = require("../functions/functions");
 const { v4 } = require("uuid");
 
 // const tableName = process.env.TABLE_NAME;
@@ -13,6 +14,9 @@ module.exports.createAuction = async (event, context) => {
       title,
       status: "OPEN",
       createdAt: new Date().toDateString(),
+      highestBid: {
+        amount: 0,
+      },
     };
 
     const item = await dynamoDB
@@ -21,7 +25,7 @@ module.exports.createAuction = async (event, context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify(items),
+      body: JSON.stringify(item),
     };
   } catch (err) {
     console.log("AN ERROR OCCURED", err);
@@ -48,25 +52,58 @@ module.exports.getAuctions = async (event, context) => {
   }
 };
 
-module.exports.getAuctionById = async (event, context) => {
+module.exports.getAuction = async (event, context) => {
   try {
     const { id } = event.pathParameters;
-    console.log(id);
-    const auction = await dynamoDB.get({
-      TableName: tableName,
-      Key: {
-        id,
-      },
-    });
-    console.log(auction);
+    // console.log(id);
+
+    const result = await getAuctionById(id);
     return {
       statusCode: 200,
-      body: auction,
+      body: result,
     };
   } catch (err) {
     console.log("AN ERROR OCCURED", err);
     return {
       statusCode: 200,
+      body: JSON.stringify(err),
+    };
+  }
+};
+
+module.exports.placeBid = async (event, context) => {
+  try {
+    const { id } = event.pathParameters;
+    const { amount } = event.body;
+
+    const auction = await getAuctionById(id);
+
+    if (auction.highestBid.amount >= amount) {
+      console.log("The bid amount must be higher than the highest bid made");
+    }
+
+    const params = {
+      TableName: tableName,
+      key: {
+        id,
+      },
+      UpdateExpression: "set highestBid.amount = :amount",
+      ExpressionAttributeValues: {
+        ":amount": amount,
+      },
+      ReturnValues: "ALL_NEW",
+    };
+
+    const updatedAuction = await dynamoDB.patch(params).promise;
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(updatedAuction),
+    };
+  } catch (err) {
+    console.log("AN ERROR OCCURED", err);
+    return {
+      statusCode: 404,
       body: JSON.stringify(err),
     };
   }
