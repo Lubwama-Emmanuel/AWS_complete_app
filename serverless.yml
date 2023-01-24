@@ -39,7 +39,7 @@ functions:
           path: /getAuctions
 
   getAuction:
-    handler: src/handlers/handler.getAuctionById
+    handler: src/handlers/handler.getAuction
     events:
       - http:
           method: GET
