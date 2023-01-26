@@ -1,4 +1,4 @@
-service: sls-base
+service: AWS-SERVERLESS
 
 frameworkVersion: "3"
 
@@ -47,10 +47,15 @@ functions:
 
   placeBid:
     handler: src/handlers/handler.placeBid
-    event:
+    events:
       - http:
           method: PATCH
           path: /placeBid/{id}/bids
+
+  processBids:
+    handler: src/handlers/handler.processBids
+    # events:
+    #   - schedule: rate(1 minute)
 
 custom:
   AuctionsTable:

@@ -3,16 +3,16 @@ const tableName = "AuctionTable-dev";
 
 module.exports.getAuctionById = async (id) => {
   let auction;
-  console.log("We reachin");
   try {
-    const result = await dynamoDB.get({
-      TableName: tableName,
-      Key: {
-        id,
-      },
-    });
-    console.log(result)
-    auction = result.item;
+    const result = await dynamoDB
+      .get({
+        TableName: tableName,
+        Key: {
+          id,
+        },
+      })
+      .promise();
+    auction = result.Item;
   } catch (err) {
     console.log("AN ERROR OCCURED", err);
     return {

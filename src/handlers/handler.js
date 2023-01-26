@@ -1,5 +1,6 @@
 const dynamoDB = require("../database/db");
 const { getAuctionById } = require("../lib/functions");
+const { endedAuctions } = require("../lib/getEndedAuctions");
 const { v4 } = require("uuid");
 
 // const tableName = process.env.TABLE_NAME;
@@ -20,7 +21,7 @@ module.exports.createAuction = async (event, context) => {
       highestBid: {
         amount: 0,
       },
-      endedAt: expires
+      endedAt: expires.toISOString()
     };
 
     await dynamoDB
@@ -62,6 +63,7 @@ module.exports.getAuction = async (event, context) => {
     // console.log(id);
 
     const result = await getAuctionById(id);
+    console.log("here is the result", result)
     return {
       statusCode: 200,
       body: JSON.stringify(result),
@@ -78,17 +80,18 @@ module.exports.getAuction = async (event, context) => {
 module.exports.placeBid = async (event, context) => {
   try {
     const { id } = event.pathParameters;
-    const { amount } = event.body;
+    const { amount } = JSON.parse(event.body);
+    // console.log(event)
 
     const auction = await getAuctionById(id);
 
     if (auction.highestBid.amount >= amount) {
-      console.log("The bid amount must be higher than the highest bid made");
+      throw new Error("The bid amount must be higher than the highest bid made")
     }
 
     const params = {
       TableName: tableName,
-      key: {
+      Key: {
         id,
       },
       UpdateExpression: "set highestBid.amount = :amount",
@@ -98,7 +101,7 @@ module.exports.placeBid = async (event, context) => {
       ReturnValues: "ALL_NEW",
     };
 
-    const updatedAuction = await dynamoDB.patch(params).promise;
+    const updatedAuction = await dynamoDB.update(params).promise();
 
     return {
       statusCode: 200,
@@ -112,3 +115,8 @@ module.exports.placeBid = async (event, context) => {
     };
   }
 };
+
+module.exports.processBids = async (event) => {
+  const closedAuctions = await endedAuctions()
+  console.log(closedAuctions)
+}

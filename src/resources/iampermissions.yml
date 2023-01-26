@@ -5,5 +5,7 @@ IAMPERMISSIONS:
     - 'dynamodb:Scan'
     - 'dynamodb:GetItem'
     - 'dynamodb:PatchItem'
+    - 'dynamodb:Query'
   Resource:
     - ${self:custom.AuctionsTable.arn}
+    - !Join ['/', ['${self:custom.AuctionsTable.arn}', 'index', 'statusAndEndDate']]
