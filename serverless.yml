@@ -25,37 +25,37 @@ resources:
 
 functions:
   createAuction:
-    handler: src/handlers/handler.createAuction
+    handler: src/handlers/createAuction.createAuction
     events:
       - http:
           method: POST
           path: /create
 
   getAuctions:
-    handler: src/handlers/handler.getAuctions
+    handler: src/handlers/getAuctions.getAuctions
     events:
       - http:
           method: GET
           path: /getAuctions
 
   getAuction:
-    handler: src/handlers/handler.getAuction
+    handler: src/handlers/getAuction.getAuction
     events:
       - http:
           method: GET
           path: /getAuction/{id}
 
   placeBid:
-    handler: src/handlers/handler.placeBid
+    handler: src/handlers/placeBid.placeBid
     events:
       - http:
           method: PATCH
           path: /placeBid/{id}/bids
 
   processBids:
-    handler: src/handlers/handler.processBids
+    handler: src/handlers/processBids.processBids
     # events:
-    #   - schedule: rate(1 minute)
+    #   - schedule: 
 
 custom:
   AuctionsTable:
