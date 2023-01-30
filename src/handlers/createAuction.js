@@ -1,4 +1,5 @@
 const dynamoDB = require("../database/db");
+const auctionSchema = require("../lib/schemas/getAuctionsSchema");
 const { v4 } = require("uuid");
 
 // const tableName = process.env.TABLE_NAME;
@@ -6,6 +7,15 @@ const tableName = "AuctionTable-dev";
 
 module.exports.createAuction = async (event, context) => {
   try {
+    const { error } = auctionSchema.validate(JSON.parse(event.body));
+
+    if (error) {
+      console.log(error)
+      return {
+        statusCode: 400,
+        body: JSON.stringify(error),
+      };
+    }
     const { title } = JSON.parse(event.body);
     const now = new Date();
     const expires = new Date();
