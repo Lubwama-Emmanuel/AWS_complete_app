@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@middy/core": "^4.2.1",
+    "@middy/validator": "^4.2.1",
     "aws-sdk": "^2.1299.0",
+    "joi": "^17.7.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

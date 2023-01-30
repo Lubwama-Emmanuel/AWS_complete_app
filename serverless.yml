@@ -54,8 +54,10 @@ functions:
 
   processBids:
     handler: src/handlers/processBids.processBids
-    # events:
-    #   - schedule: 
+    events:
+      - http:
+          method: GET
+          path: /processBids
 
 custom:
   AuctionsTable:
