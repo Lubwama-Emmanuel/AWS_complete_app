@@ -30,6 +30,7 @@ functions:
       - http:
           method: POST
           path: /create
+          authorizer: ${self:custom.authorizer}
 
   getAuctions:
     handler: src/handlers/getAuctions.getAuctions
@@ -37,6 +38,7 @@ functions:
       - http:
           method: GET
           path: /getAuctions
+          authorizer: ${self:custom.authorizer}
 
   getAuction:
     handler: src/handlers/getAuction.getAuction
@@ -44,6 +46,7 @@ functions:
       - http:
           method: GET
           path: /getAuction/{id}
+          authorizer: ${self:custom.authorizer}
 
   placeBid:
     handler: src/handlers/placeBid.placeBid
@@ -51,6 +54,7 @@ functions:
       - http:
           method: PATCH
           path: /placeBid/{id}/bids
+          authorizer: ${self:custom.authorizer}
 
   processBids:
     handler: src/handlers/processBids.processBids
@@ -60,6 +64,7 @@ functions:
           path: /processBids
 
 custom:
+  authorizer: arn:aws:lambda:${aws:region}:${aws:accountId}:function:auth-service-${self:provider.stage}-auth
   AuctionsTable:
     name: !Ref AuctionTable
     arn: !GetAtt AuctionTable.Arn
