@@ -18,5 +18,13 @@
   },
   "devDependencies": {
     "serverless-offline": "^12.0.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lubwama-Emmanuel/AWS_complete_app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Lubwama-Emmanuel/AWS_complete_app/issues"
+  },
+  "homepage": "https://github.com/Lubwama-Emmanuel/AWS_complete_app#readme"
 }
