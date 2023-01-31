@@ -10,13 +10,18 @@ module.exports.createAuction = async (event, context) => {
     const { error } = auctionSchema.validate(JSON.parse(event.body));
 
     if (error) {
-      console.log(error)
+      console.log(error);
       return {
         statusCode: 400,
         body: JSON.stringify(error),
       };
     }
+
+
     const { title } = JSON.parse(event.body);
+    const { seller } = JSON.parse(event.requestContext.authorizer.nickname);
+
+    console.log("Worked", seller);
     const now = new Date();
     const expires = new Date();
     expires.setHours(expires.getHours() + 1);
@@ -30,6 +35,7 @@ module.exports.createAuction = async (event, context) => {
         amount: 0,
       },
       endingAt: expires.toISOString(),
+      seller,
     };
 
     await dynamoDB.put({ TableName: tableName, Item: items }).promise();
