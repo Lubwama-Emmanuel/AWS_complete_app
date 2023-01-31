@@ -6,6 +6,7 @@ const tableName = "AuctionTable-dev";
 module.exports.placeBid = async (event, context) => {
   try {
     const { error } = placeBidSchema.validate(JSON.parse(event.body));
+    const { bidder } = JSON.parse(event.requestContext.authorizer.nickname);
     if (error) {
       console.log(error);
       return {
@@ -18,10 +19,22 @@ module.exports.placeBid = async (event, context) => {
     const { amount } = JSON.parse(event.body);
     const auction = await getAuctionById(id);
 
+    // Auction status validation
     if (auction.status === "CLOSED") {
       throw new Error("The auction is closed already, you cannot bid on it");
     }
 
+    // Avoiding sellers from bidding on their products
+    if (auction.seller === bidder) {
+      throw new Error("A seller is not allowed to bid on their own items");
+    }
+
+    // Avoid bidder bidding twice
+    if (auction.highestBid.bidder === bidder) {
+      throw new Error("You cannot bid twice");
+    }
+
+    // Checking if the bidding price is not less than the highest bid
     if (auction.highestBid.amount >= amount) {
       throw new Error(
         "The bid amount must be higher than the highest bid made"
@@ -33,9 +46,11 @@ module.exports.placeBid = async (event, context) => {
       Key: {
         id,
       },
-      UpdateExpression: "set highestBid.amount = :amount",
+      UpdateExpression:
+        "set highestBid.amount = :amount, highestBid.bidder = :bidder",
       ExpressionAttributeValues: {
         ":amount": amount,
+        ":bidder": bidder,
       },
       ReturnValues: "ALL_NEW",
     };
