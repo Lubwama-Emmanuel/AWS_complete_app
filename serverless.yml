@@ -14,10 +14,12 @@ provider:
   region: us-east-2
   environment:
     TABLE_NAME: ${self:custom.AuctionsTable.name}
+    MAIL_QUEUE: ${self:custom.MailQueue.url}
   iam:
     role:
       statements:
-        - ${file(src/resources/iampermissions.yml):IAMPERMISSIONS}
+        - ${file(src/resources/dynamodbIAM.yml):DynamoDbIAM}
+        - ${file(src/resources/mailQueueIAM.yml):MailQueueIAM}
 
 resources:
   Resources:
@@ -68,3 +70,7 @@ custom:
   AuctionsTable:
     name: !Ref AuctionTable
     arn: !GetAtt AuctionTable.Arn
+  MailQueue:
+    # arn: ${cf:notification-service-${self:provider.stage}.MailQueueArn.Value}
+    arn: "arn:aws:sqs:${aws:region}:${aws:accountId}:MailQueue-${self:provider.stage}"
+    url: "https://sqs.${aws:region}.amazonaws.com/${aws:accountId}/MailQueue-${self:provider.stage}"
