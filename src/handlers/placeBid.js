@@ -5,18 +5,19 @@ const tableName = "AuctionTable-dev";
 
 module.exports.placeBid = async (event, context) => {
   try {
-    const { error } = placeBidSchema.validate(JSON.parse(event.body));
-    const { bidder } = JSON.parse(event.requestContext.authorizer.nickname);
-    if (error) {
-      console.log(error);
-      return {
-        statusCode: 400,
-        body: JSON.stringify(error.message),
-      };
-    }
+    // const { error } = placeBidSchema.validate(JSON.parse(event.body));
+    
+    // if (error) {
+    //   console.log(error);
+    //   return {
+    //     statusCode: 400,
+    //     body: JSON.stringify(error.message),
+    //   };
+    // }
 
     const { id } = event.pathParameters;
     const { amount } = JSON.parse(event.body);
+    const  bidder  = event.requestContext.authorizer.bidder;
     const auction = await getAuctionById(id);
 
     // Auction status validation
@@ -25,14 +26,14 @@ module.exports.placeBid = async (event, context) => {
     }
 
     // Avoiding sellers from bidding on their products
-    if (auction.seller === bidder) {
+    if (bidder === auction.seller) {
       throw new Error("A seller is not allowed to bid on their own items");
     }
 
     // Avoid bidder bidding twice
-    if (auction.highestBid.bidder === bidder) {
-      throw new Error("You cannot bid twice");
-    }
+    // if (auction.highestBid.bidder === bidder) {
+    //   throw new Error("You cannot bid twice");
+    // }
 
     // Checking if the bidding price is not less than the highest bid
     if (auction.highestBid.amount >= amount) {
@@ -59,7 +60,7 @@ module.exports.placeBid = async (event, context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify(updatedAuction),
+      body: JSON.stringify(event),
     };
   } catch (err) {
     console.log("AN ERROR OCCURED", err);
