@@ -7,21 +7,19 @@ const tableName = "AuctionTable-dev";
 
 module.exports.createAuction = async (event, context) => {
   try {
-    const { error } = auctionSchema.validate(JSON.parse(event.body));
+    // const { error } = auctionSchema.validate(JSON.parse(event.body));
 
-    if (error) {
-      console.log(error);
-      return {
-        statusCode: 400,
-        body: JSON.stringify(error),
-      };
-    }
-
+    // if (error) {
+    //   console.log(error);
+    //   return {
+    //     statusCode: 400,
+    //     body: JSON.stringify(error),
+    //   };
+    // }
 
     const { title } = JSON.parse(event.body);
-    const { seller } = JSON.parse(event.requestContext.authorizer.nickname);
+    const seller = event.requestContext.authorizer.email;
 
-    console.log("Worked", seller);
     const now = new Date();
     const expires = new Date();
     expires.setHours(expires.getHours() + 1);
@@ -33,6 +31,7 @@ module.exports.createAuction = async (event, context) => {
       createdAt: now.toISOString(),
       highestBid: {
         amount: 0,
+        bidder: "",
       },
       endingAt: expires.toISOString(),
       seller,
