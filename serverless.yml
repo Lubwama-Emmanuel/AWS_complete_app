@@ -1,0 +1,34 @@
+service: notification-service
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  region: us-east-2
+  runtime: nodejs12.x
+  iam:
+    role:
+      statements:
+        - ${file(src/resources/iam.yml):SES_IAM}
+
+resources:
+  Resources: 
+    MailQueue: ${file(src/resources/mailQueue.yml):MAIL_QUEUE}
+  Outputs:
+    MaileQueueArn: ${file(src/resources/mailQueue.yml):Outputs.MailQueueArn}
+    MaileQueueUrl: ${file(src/resources/mailQueue.yml):Outputs.MailQueueUrl}
+
+functions:
+  sendMail:
+    handler: src/handlers/handler.sendEmail
+    events:
+      - sqs:
+          arn: ${self:custom.MailQueue.arn}
+          batchSize: 1
+
+custom:
+  MailQueue:
+    name: MailQueue-${self:provider.stage}
+    arn: !GetAtt MailQueue.Arn
+    url: !Ref MailQueue
